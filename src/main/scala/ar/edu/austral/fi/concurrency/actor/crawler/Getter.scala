@@ -16,8 +16,18 @@ class Getter(url: String, depth: Int) extends Actor {
   client get url pipeTo self
 
   def receive: Receive = {
-    case body: String => ???
-    case _: Status.Failure => context.stop(self)
+    case body: String =>
+      ???
+    case _: Status.Failure =>
+      context.stop(self)
+  }
+  
+  def findLinks(body: String): Iterator[String] = {
+    val document = Jsoup.parse(body, url)
+    val links = document.select("a[href]")
+    for {
+      link <- links.iterator().asScala
+    } yield link.absUrl("href")
   }
 
 }
